@@ -1,0 +1,29 @@
+===================================================================
+AISTUDIO CORP - GLOBAL CYBERSECURITY & ACCESS CONTROL POLICY v4.2
+===================================================================
+
+1. PURPOSE & SCOPE
+This document outlines mandatory cybersecurity controls, key management protocols,
+and access control policies for all engineering personnel at AI Studio Corp.
+
+2. AUTHENTICATION & MULTI-FACTOR AUTHENTICATION (MFA)
+2.1 All employees must use hardware security keys (e.g. YubiKey 5 Series) for MFA.
+2.2 SMS-based or email-based MFA is strictly prohibited for production environment access.
+2.3 Passwords must be a minimum of 16 characters and rotated every 90 days.
+2.4 Account lockouts trigger after 5 consecutive failed authentication attempts and require Security Operations Center (SOC) manual reset.
+
+3. API KEY MANAGEMENT & SECRET STORAGE
+3.1 Production API keys (including Gemini API, AWS credentials, and database URIs) MUST be stored in HashiCorp Vault or Cloud Key Management Service (KMS).
+3.2 API keys must NEVER be committed to Git repositories or hardcoded in client-side code.
+3.3 All API keys must undergo automated 30-day credential rotation.
+3.4 Environment variables in staging/production must be injected at runtime via encrypted secrets managers.
+
+4. REMOTE ACCESS & VPN PROTOCOLS
+4.1 Access to internal production networks requires connection through the WireGuard Enterprise VPN.
+4.2 Split-tunneling is strictly disabled on enterprise laptops.
+4.3 Zero Trust Network Access (ZTNA) evaluates posture based on device health, OS patch level, and location before granting access to infrastructure.
+
+5. ENCRYPTION STANDARDS
+5.1 Data at rest must be encrypted using AES-256-GCM.
+5.2 Data in transit must use TLS 1.3. Legacy protocols (TLS 1.0, 1.1, 1.2) are disabled on all load balancers.
+5.3 Master keys are stored in Dedicated Hardware Security Modules (HSM) with FIPS 140-2 Level 3 compliance.

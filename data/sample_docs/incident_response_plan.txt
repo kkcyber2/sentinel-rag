@@ -1,0 +1,25 @@
+===================================================================
+AISTUDIO CORP - INCIDENT RESPONSE & DATA BREACH PLAYBOOK
+Version: 3.1 | Effective Date: May 2026
+===================================================================
+
+1. INCIDENT SEVERITY CLASSIFICATION
+- SEV-0 (Critical): Active data exfiltration, total outage of primary production cluster, ransomware. Response SLA: 15 minutes.
+- SEV-1 (High): Unauthorized access to non-sensitive staging database, major partial outage. Response SLA: 30 minutes.
+- SEV-2 (Medium): Single user account compromise, localized malware on non-critical laptop. Response SLA: 2 hours.
+- SEV-3 (Low): Minor policy violation, spam phishing attempt with zero clicks. Response SLA: 24 hours.
+
+2. INCIDENT COMMAND STRUCTURE
+2.1 Incident Commander (IC): Leads triage and coordinates response streams.
+2.2 Lead Investigator: Conducts forensic investigation, log analysis (Datadog/Elastic), and timeline reconstruction.
+2.3 Communications Lead: Manages customer notifications, legal disclosures, and regulatory filings.
+
+3. MANDATORY ESCALATION & NOTIFICATION TIMELINES
+3.1 EU GDPR Data Protection Officer (DPO) notification required within 72 hours of confirmed breach involving personally identifiable information (PII).
+3.2 Executive Leadership (CEO, CISO, General Counsel) must be briefed within 1 hour for any SEV-0 or SEV-1 incident.
+3.3 Affected Enterprise Customers must be notified via security-advisories@aistudio.dev within 24 hours of breach confirmation.
+
+4. CONTAINMENT & FORENSICS PROTOCOLS
+4.1 Immediately isolate compromised VM instances or Kubernetes pods using NetworkSecurityGroup egress deny rules. Do NOT terminate instances before memory dump capture.
+4.2 Preserve volatile memory (RAM) and snapshot root volumes before applying remediations.
+4.3 Revoke all compromised session tokens and force password reset via Okta API.

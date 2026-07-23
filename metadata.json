@@ -1,0 +1,6 @@
+{
+  "name": "Sentinel-RAG",
+  "description": "Self-Verifying Document Q&A with Local Multi-Agent Workflow featuring Researcher and Verifier agents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
