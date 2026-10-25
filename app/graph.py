@@ -193,7 +193,7 @@ def node_verify(state: GraphState) -> Dict[str, Any]:
     if not chunks:
         return {
             "verified": False,
-            "verification_result": {"approved": False, "issues": ["No context available."], "reasoning": "No chunks found."}
+            "verification_result": {"approved": False, "issues": ["No document context retrieved."], "reasoning": "Vector database contains no matching chunks."}
         }
 
     formatted_context = "\n\n".join([
@@ -285,6 +285,11 @@ def route_after_verify(state: GraphState) -> str:
     Otherwise -> revise
     """
     if state.get("verified", False) or state.get("attempt_count", 0) >= MAX_REVISION_ATTEMPTS:
+        return "finalize"
+    # Nothing was retrieved, so there is nothing to revise against. Sending this
+    # to the revise node tried to answer from an empty context and raised when
+    # the model was unreachable, turning a "no documents" result into a crash.
+    if not state.get("retrieved_chunks"):
         return "finalize"
     return "revise"
 

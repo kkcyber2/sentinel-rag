@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-rag"
+version = "0.1.0"
+description = "Retrieval-augmented question answering with an independent verifier that rejects unsupported claims"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Konain Sultan Khan (KK)", email = "kkdev9715@gmail.com" }]
+keywords = ["rag", "langchain", "langgraph", "verification", "hallucination"]
+dependencies = [
+  # Ranges rather than pins: langchain-community 0.3.x needs langchain>=0.3.19
+  # and each langchain minor raises its langchain-core floor, so the earlier
+  # file's fixed triple (langchain 0.3.18 + community 0.3.18 + splitters 0.3.6)
+  # was not installable by any resolver.
+  "langchain>=0.3.19,<0.4",
+  "langchain-community>=0.3.19,<0.4",
+  "langchain-ollama>=0.2.2,<0.3",
+  "langchain-google-genai>=2.0.10,<3",
+  "langchain-text-splitters>=0.3.9,<0.4",
+  "langgraph>=0.2.74,<0.3",
+  "chromadb==0.6.3",
+  "fastapi==0.115.8",
+  "uvicorn==0.34.0",
+  "streamlit==1.42.0",
+  "pypdf==5.3.0",
+  "pydantic==2.10.6",
+  "requests==2.32.3",
+  "httpx==0.28.1",
+  "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.4"]
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

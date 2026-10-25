@@ -1,11 +1,15 @@
-# 🛡️ Sentinel-RAG: Self-Verifying Document Q&A
+# Sentinel-RAG: Self-Verifying Document Q&A
 
 **Sentinel-RAG** is a production-grade document Q&A system that eliminates RAG hallucinations through a **two-agent self-verifying workflow**:
 
 1. **Researcher Agent**: Retrieves top-k document chunks and drafts an initial answer grounded in source context.
 2. **Verifier Agent**: Fact-checks every claim in the draft against raw source chunks. Unsupported claims trigger a **revision loop** (up to 2 retries).
 
-Result: **Zero hallucinations, 100% explainability.**
+Result: unsupported claims are caught and rewritten before the answer is
+returned, and every step is recorded. That is a large reduction in
+hallucination, not a guarantee of zero — the verifier is a second model and can
+itself be wrong. What you can rely on is that any unverified draft is visible in
+the audit trail rather than silently shipped.
 
 ---
 
@@ -19,7 +23,7 @@ Result: **Zero hallucinations, 100% explainability.**
 ✅ **REST API** - FastAPI endpoints for seamless integration  
 ✅ **Multiple UIs** - React dashboard + Streamlit web interface  
 ✅ **Docker Ready** - One-command deployment with docker-compose  
-✅ **Tested & Verified** - Comprehensive test suite with qwen2.5-coder:7b ✅
+- **Tested** - 11 tests, no Ollama server needed (the model is mocked)
 
 ---
 
@@ -122,34 +126,25 @@ uvicorn app.main:app --reload
 # 4. In another terminal, start Streamlit
 streamlit run ui/streamlit_app.py
 
-# 5. Run tests
-python3 test_qwen_rag.py
+# 5. Run the test suite (no Ollama needed - the model is mocked)
+./run_tests.sh
 ```
 
 ---
 
-## ✅ Testing & Verification
+## Testing
 
-### Quick Test Suite
 ```bash
-python3 test_qwen_rag.py
+./run_tests.sh          # 11 tests, no Ollama server required
 ```
 
-**Test Coverage:**
-- ✅ Model response quality & speed
-- ✅ Document context retrieval accuracy  
-- ✅ Multi-turn reasoning & validation
-- ✅ Verified/unverified badge accuracy
+The suite mocks the model, so it runs in CI and on a machine with no Ollama
+installed. Run it after changing the graph or the prompts.
 
-**Results with qwen2.5-coder:7b:**
-- Password policy analysis: ✅ PASS
-- Document extraction: ✅ PASS (correctly identified "16 characters")
-- NIST compliance reasoning: ✅ PASS
-
-### Full Test Suite
-```bash
-PYTHONPATH=. python -m pytest tests/ -v
-```
+**What the tests cover:** health and error paths over real HTTP, retrieval
+hitting an empty store, menu-of-intents routing, the verifier rejecting an
+out-of-scope draft, the revision loop recovering into a grounded answer, retry
+counts, and document ingestion/chunking.
 
 ---
 

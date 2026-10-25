@@ -76,3 +76,6 @@ logs/
 *.tmp
 *.bak
 tmp/
+__pycache__/
+*.pyc
+.pytest_cache/

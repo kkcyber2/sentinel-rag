@@ -41,14 +41,28 @@ class TestGraphWorkflow(unittest.TestCase):
         mock_search.return_value = [
             {"id": "chunk_1", "text": "This document covers password complexity rules.", "metadata": {"source": "policy.txt", "page": 1}}
         ]
+        # The graph drafts, verifies, revises, then verifies again, so the mock
+        # must cover all four calls. Supplying only two left the revise step to
+        # raise StopIteration, which surfaced as a RuntimeError from inside the
+        # graph instead of the assertion this test is about.
         mock_invoke.side_effect = [
-            "The capital of France is Paris.", # Research draft hallucination
-            '{"approved": false, "issues": ["Capital of France is not in the document."], "reasoning": "Out of scope"}' # Verifier rejection
+            "The capital of France is Paris.",  # draft: hallucination, out of scope
+            '{"approved": false, "issues": ["Capital of France is not in the document."], "reasoning": "Out of scope"}',
+            "The document does not state the capital of France.",  # revision: refuses to answer
+            '{"approved": true, "issues": [], "reasoning": "Revision is grounded in the source"}',
         ]
 
         res = run_sentinel_workflow("What is the capital of France?")
-        self.assertFalse(res["verified"])
-        self.assertIn("issues", res)
+
+        # The verifier must have rejected the draft at least once, and the
+        # hallucinated claim must not survive into the final answer. Asserting
+        # verified is False would be wrong: the rejection is what triggers the
+        # revision, and the grounded revision is legitimately approved.
+        verifications = [s for s in res["audit_trail"] if s.get("step") == "verify"]
+        self.assertTrue(verifications, "expected the draft to be verified")
+        self.assertFalse(verifications[0]["verification"]["approved"],
+                         "the out-of-scope draft should have been rejected")
+        self.assertNotIn("Paris", res["answer"])
 
     @patch('app.graph.invoke_llm')
     @patch.object(vector_store, 'search')
